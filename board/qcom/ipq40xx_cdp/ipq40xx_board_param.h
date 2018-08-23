@@ -774,7 +774,7 @@ i2c_cfg_t i2c0 = {
 #ifdef CONFIG_IPQ40XX_PCI
 
 #define PCIE_RST_GPIO		38
-#define PCIE_WAKE_GPIO		40
+#define PCIE_WAKE_GPIO		50
 #define PCIE_CLKREQ_GPIO	39
 
 #define PCIE20_0_PARF_PHYS	0x80000
@@ -941,14 +941,20 @@ board_ipq40xx_params_t board_params[] = {
 		.console_uart_cfg = &uart1_console_uart_dk01,
 		.sw_gpio = sw_gpio_qfn,
 		.sw_gpio_count = ARRAY_SIZE(sw_gpio_qfn),
+		.rgmii_gpio = rgmii_gpio_cfg,
+		.rgmii_gpio_count = ARRAY_SIZE(rgmii_gpio_cfg),
 		.edma_cfg = {
-			ipq40xx_edma_cfg(0, 5, PSGMII,
-					0, 1, 2, 3, 4)
+			ipq40xx_edma_cfg(0, 1, RGMII, 0)
 		},
 		.spi_nand_available = 0,
 		.nor_nand_available = 0,
 		.nor_emmc_available = 0,
 		.dtb_config_name = "#config@1",
+#ifdef CONFIG_IPQ40XX_PCI
+		.pcie_cfg = {
+			pcie_board_cfg(0),
+		},
+#endif
 	},
 	{
 		.machid = MACH_TYPE_IPQ40XX_AP_DK01_1_C2,

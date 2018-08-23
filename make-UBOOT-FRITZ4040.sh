@@ -1,6 +1,6 @@
 #!/bin/sh
 
-OPENWRT_OR_LEDE_TOOLCHAIN_FOR_ARM7=/mnt/build/lede/ac58u/staging_dir/toolchain-arm_cortex-a15+neon-vfpv4_gcc-5.5.0_musl_eabi/bin/
+OPENWRT_OR_LEDE_TOOLCHAIN_FOR_ARM7=/mnt/build-ssd/openwrt/wap60g/staging_dir/toolchain-arm_cortex-a7+neon-vfpv4_gcc-7.3.0_musl_eabi/bin/
 
 die() {
 	echo Error: $1

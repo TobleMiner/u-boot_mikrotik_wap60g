@@ -176,6 +176,10 @@ const uchar *env_get_addr(int index)
 
 void set_default_env(const char *s)
 {
+	printf("Max env size: %d\n", ENV_SIZE);
+	puts("===DEFAULT_ENV_START===\n");
+	puts(s);
+	puts("\n===DEFAULT_ENV_END===\n");
 	if (sizeof(default_environment) > ENV_SIZE) {
 		puts("*** Error - default environment is too large\n\n");
 		return;

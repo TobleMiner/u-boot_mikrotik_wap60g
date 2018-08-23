@@ -10,13 +10,14 @@
 #define CONFIG_MODEL_FRITZ4040
 #define CONFIG_MODEL		"FRITZ4040"
 #define MTDIDS_DEFAULT		"nand0=nand0"
-#define MTDPARTS_DEFAULT	"mtdparts=nand0:1152k(urlader)ro,512k(tffs1)ro,512k(tffs2)ro,512k(uboot)ro,29056k(firmware),1024k@0x1F00000(jffs2)ro"
+// Preliminary defs, watch out for possible calibration data at end of flash
+#define MTDPARTS_DEFAULT	"mtdparts=nand0:512k(qcom)ro,2560k(u-boot)ro,9216k(firmware)"
 
 #undef CONFIG_BOOTDELAY
 #define CONFIG_BOOTDELAY 3
 
 #undef CONFIG_BOOTCOMMAND
-#define CONFIG_BOOTCOMMAND		"run fritzboot"
+#define CONFIG_BOOTCOMMAND		"boot"
 
 #define CONFIG_EXTRA_ENV_SETTINGS				\
 	"mtdids=" MTDIDS_DEFAULT "\0"				\
@@ -26,7 +27,7 @@
 	"fritzboot=run nandboot || run tftpboot;\0"		\
 
 #undef V_PROMPT
-#define V_PROMPT		"(" CONFIG_MODEL ") # "
+#define V_PROMPT		"(wAP60 G) # "
 
 #define CONFIG_SERVERIP         192.168.1.70
 #define CONFIG_NETMASK          255.255.255.0
@@ -41,6 +42,17 @@
 #define CONFIG_CMD_LOADB
 #define CONFIG_CMD_SPI
 #define CONFIG_CMD_TFTPSRV
+#define CONFIG_CMD_PCI
+#define DEBUG 42
+
+#define CONFIG_PCI
+#define CONFIG_IPQ40XX_PCI
+
+#ifndef CONFIG_FIT
+#define CONFIG_FIT
+#endif
+
+#undef CONFIG_ENV_IS_IN_FLASH
 
 #undef CONFIG_SYS_LOAD_ADDR
 #define CONFIG_SYS_LOAD_ADDR    0x85000000

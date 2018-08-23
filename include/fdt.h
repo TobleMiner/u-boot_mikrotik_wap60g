@@ -1,5 +1,5 @@
-#ifndef _FDT_H
-#define _FDT_H
+#ifndef FDT_H
+#define FDT_H
 
 #ifndef __ASSEMBLY__
 

@@ -211,6 +211,7 @@ int smem_ptable_init(void)
 		/*
 		 * Trying for max partition 16 in case of smem_read_alloc_entry fails
 		 */
+		printf("Failed to get dynamic smem partition count\n");
 		ret = smem_read_alloc_entry(SMEM_AARM_PARTITION_TABLE, &smem_ptable,
 			sizeof(smem_ptable) - (sizeof(struct smem_ptn) * SMEM_PTABLE_PARTS_DEFAULT));
 	}

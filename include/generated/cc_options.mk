@@ -8,3 +8,4 @@ CC_OPTIONS += -Wno-format-nonliteral
 CC_OPTIONS += -Wno-format-security
 CC_OPTIONS += -fstack-usage
 CC_OPTIONS += -mabi=apcs-gnu
+CC_OPTIONS += -fno-toplevel-reorder

@@ -74,6 +74,7 @@ extern int qpic_nand_init(struct qpic_nand_init_config *config);
 extern void nand_env_relocate_spec(void);
 extern int ipq40xx_edma_init(ipq40xx_edma_board_cfg_t *edma_cfg);
 extern int ipq40xx_qca8075_phy_init(struct ipq40xx_eth_dev *cfg);
+extern int ipq40xx_qca8033_phy_init(struct ipq40xx_eth_dev *cfg);
 extern void ipq40xx_register_switch(
 	int (*sw_init)(struct ipq40xx_eth_dev *cfg));
 extern int mmc_env_init(void);
@@ -229,23 +230,30 @@ int board_init(void)
 	}
 
 	if (sfi->flash_type != SMEM_BOOT_MMC_FLASH) {
+		printf("Flash is not MMC, setting board_env_range, board_env_size to %d\n", CONFIG_ENV_SIZE);
 		board_env_range = CONFIG_ENV_SIZE;
 		board_env_size = CONFIG_ENV_SIZE;
 
 		ret = smem_getpart("0:APPSBLENV", &start_blocks, &size_blocks);
 		if (ret < 0) {
 			printf("cdp: get environment part failed\n");
-			return ret;
+//			return ret;
 		}
-
+/*
 		board_env_offset = ((loff_t) sfi->flash_block_size) * start_blocks;
 		board_env_size = ((loff_t) sfi->flash_block_size) * size_blocks;
+*/
+// Set bogus values
+		board_env_offset = 0x2000;
+		board_env_size = 0x2000;
+		printf("Got environment partition, Setting board_env_offset, board_env_size to %lt, %lt\n", board_env_offset, board_env_size);
 	}
 
 	if (sfi->flash_type == SMEM_BOOT_NAND_FLASH) {
 		board_env_range = CONFIG_ENV_SIZE_MAX;
 		BUG_ON(board_env_size < CONFIG_ENV_SIZE_MAX);
 	} else if (sfi->flash_type == SMEM_BOOT_SPI_FLASH) {
+		printf("SPI flash detected, setting board_env_range to %lt\n", board_env_size);
 		board_env_range = board_env_size;
 		BUG_ON(board_env_size > CONFIG_ENV_SIZE_MAX);
 #ifdef CONFIG_QCA_MMC
@@ -450,8 +458,8 @@ int get_eth_mac_address(uchar *enetaddr, uint no_of_macs)
 #ifdef CONFIG_MODEL_FRITZ4040
 	u8 data[1024];
 	const u32 *urconfig;
-
 	/* ART partition 0th position will contain Mac address. */
+/*
 	art_offset = 0x11DC00;
 
 	length = sizeof(data);
@@ -488,6 +496,21 @@ int get_eth_mac_address(uchar *enetaddr, uint no_of_macs)
 
 	printf("macb: %x:%x:%x:%x:%x:%x\n", enetaddr[6], enetaddr[7], enetaddr[8],
 		enetaddr[9], enetaddr[10], enetaddr[11]);
+*/
+
+	enetaddr[0] = 0xDE;
+	enetaddr[1] = 0xAD;
+	enetaddr[2] = 0xBE;
+	enetaddr[3] = 0xEF;
+	enetaddr[4] = 0x23;
+	enetaddr[5] = 0x42;
+
+	enetaddr[6] = 0xDE;
+	enetaddr[7] = 0xAD;
+	enetaddr[8] = 0xBE;
+	enetaddr[9] = 0xEF;
+	enetaddr[10] = 0x42;
+	enetaddr[11] = 0x23;
 
 	return 0;
 #else
@@ -585,36 +608,45 @@ int board_eth_init(bd_t *bis)
 		qca_configure_gpio(gpio, gboard_param->sw_gpio_count);
 	}
 	switch (gboard_param->machid) {
+	printf("Machine id: %lx\n", gboard_param->machid);
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_S1:
 		mdelay(100);
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(62));
-		ipq40xx_register_switch(ipq40xx_qca8075_phy_init);
+		ipq40xx_register_switch(ipq40xx_qca8033_phy_init);
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C1:
 		mdelay(100);
-		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(59));
-		ipq40xx_register_switch(ipq40xx_qca8075_phy_init);
+// HERE!
+		mdelay(100);
+		printf("Configuring rgmii interface\n");
+		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(47));
+		gpio = gboard_param->rgmii_gpio;
+		if (gpio) {
+			printf("Configuring rgmii gpios\n");
+			qca_configure_gpio(gpio, gboard_param->rgmii_gpio_count);
+		}
+		ipq40xx_register_switch(ipq40xx_qca8033_phy_init);
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK01_1_C2:
 		mdelay(100);
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(62));
-		ipq40xx_register_switch(ipq40xx_qca8075_phy_init);
+		ipq40xx_register_switch(ipq40xx_qca8033_phy_init);
 		break;
 	case MACH_TYPE_IPQ40XX_AP_DK04_1_C1:
 	case MACH_TYPE_IPQ40XX_AP_DK04_1_C3:
 		mdelay(100);
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(47));
-		ipq40xx_register_switch(ipq40xx_qca8075_phy_init);
+		ipq40xx_register_switch(ipq40xx_qca8033_phy_init);
 		break;
 	 case MACH_TYPE_IPQ40XX_AP_DK04_1_C2:
 		mdelay(100);
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(67));
-		ipq40xx_register_switch(ipq40xx_qca8075_phy_init);
+		ipq40xx_register_switch(ipq40xx_qca8033_phy_init);
 		break;
 	 case MACH_TYPE_IPQ40XX_AP_DK06_1_C1:
 		mdelay(100);
 		writel(GPIO_OUT, GPIO_IN_OUT_ADDR(19));
-		ipq40xx_register_switch(ipq40xx_qca8075_phy_init);
+		ipq40xx_register_switch(ipq40xx_qca8033_phy_init);
 		break;
 	case MACH_TYPE_IPQ40XX_DB_DK01_1_C1:
 	case MACH_TYPE_IPQ40XX_DB_DK02_1_C1:

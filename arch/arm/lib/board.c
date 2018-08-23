@@ -645,7 +645,10 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #endif
 #if defined(CONFIG_CMD_NET)
 	puts("Net:   ");
+
+//	printf("Skipping network initialization\n");
 	eth_initialize(gd->bd);
+	printf("Eth init done\n");
 #if defined(CONFIG_RESET_PHY_R)
 	debug("Reset Ethernet PHY\n");
 	reset_phy();
@@ -680,6 +683,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #endif
 
 	/* main_loop() can return to retry autoboot, if so just run it again. */
+	printf("Main loop reached!\n");
 	for (;;) {
 		main_loop();
 	}
